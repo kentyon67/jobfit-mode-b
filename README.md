@@ -1,163 +1,233 @@
-# JobFit
+# JobFit Mode A
 
-JobFit is a Python-based job scraping and AI analysis app built to help users compare engineering job postings more efficiently.
+AIを活用して求人情報を分析・可視化する、求人分析Webアプリです。
+モードAでは
+JobFitは、求人ページをスクレイピングし、
+AIによる要約・翻訳・分類・スコアリングを行い、
+ユーザーのプロフィールに応じて求人とのマッチ度を可視化します。
 
-It collects job listings, extracts job details, enriches them with AI-generated summaries / translations / classifications / scores, and presents them through a Streamlit UI.
+---
 
-## Features
+# Live Demo
 
-- Scrape job list pages and job detail pages
-- Retry failed detail fetches
-- Build structured CSV datasets
-- AI-generated summary
-- Japanese translation for UI display
-- Job category / Python-related / AI-related classification
-- Score jobs by market value and user fit
-- Compare jobs in a Streamlit list UI
-- View detailed job information
-- Edit user profile preferences in UI
+https://YOUR-STREAMLIT-URL.streamlit.app
 
-## Project Structure
+---
+
+# Screenshots
+
+## Home
+
+![img_2.png](img_2.png)
+
+## Job List
+
+![img_3.png](img_3.png)
+
+## Job Detail
+
+![img_4.png](img_4.png)
+
+## Profile Settings
+
+![img_5.png](img_5.png)
+
+---
+
+# Features
+
+- 求人情報スクレイピング
+- AI要約
+- AI翻訳
+- 技術タグ抽出
+- 求人カテゴリ分類
+- 求人価値スコアリング
+- プロフィールベースのマッチ度計算
+- キーワード検索
+- 職種・勤務形態・雇用形態フィルタ
+- StreamlitでのWeb UI
+
+---
+
+# Tech Stack
+
+## Frontend
+
+- Streamlit
+- css
+
+## Backend / Data Processing
+
+- Python
+- pandas
+- requests
+- BeautifulSoup
+
+## AI
+
+- OpenAI API
+
+## Infrastructure
+
+- Streamlit Community Cloud
+
+---
+
+# System Architecture
 
 ```text
-src/
-  app.py
-  pipeline.py
-  fetch_list.py
-  fetch_detail.py
-  retry_failed.py
-  build_dataset.py
-  utils.py
-  user_profile.py
-  pages/
-    job_detail.py
-    profile_settings.py
-  ai/
-    summarize.py
-    translate.py
-    classify.py
-    score.py
-    compare.py
-    export_detail.py
+fetch_list
+    ↓
+fetch_detail
+    ↓
+build_dataset
+    ↓
+summarize
+    ↓
+translate
+    ↓
+classify
+    ↓
+score
+    ↓
+Streamlit UI
+```
 
-data/
-  raw/
-  output/
-  logs/
+---
 
+# Project Structure
 
-Tech Stack
-Python
-Streamlit
-pandas
-requests
-BeautifulSoup
-lxml
-OpenAI API
-Setup
-1. Clone repository
-git clone <your-repo-url>
-cd <your-repo-name>
-2. Create virtual environment
-python -m venv .venv
-3. Activate virtual environment
-Windows PowerShell
-.venv\Scripts\Activate.ps1
-macOS / Linux
-source .venv/bin/activate
-4. Install dependencies
+```text
+job_scraper/
+├── streamlit_app.py
+├── src/
+│   ├── app.py
+│   ├── cli.py
+│   ├── user_profile.py
+│   ├── analysis/
+│   │   └── ai/
+│   │       ├── summarize.py
+│   │       ├── translate.py
+│   │       ├── classify.py
+│   │       └── score.py
+│   ├── pages/
+│   │   ├── job_detail.py
+│   │   └── profile_settings.py
+│   └── pipeline/
+│
+├── data/
+│   ├── raw/
+│   └── output/
+│
+└── README.md
+```
+
+---
+
+# Key Design Decisions
+
+## 1. Separation of Responsibilities
+
+Each processing stage is separated into independent modules:
+
+- collection
+- analysis
+- classification
+- scoring
+- UI
+
+This structure makes the pipeline easier to extend and maintain.
+
+---
+
+## 2. Dynamic Profile-Based Rescoring
+
+JobFit recalculates fit scores dynamically
+based on user profile settings without rebuilding datasets.
+
+This enables fast UI-side personalization.
+
+---
+
+## 3. Preprocessed Dataset Architecture (Mode A)
+
+Mode A focuses on:
+
+- preprocessing large job datasets
+- fast UI filtering
+- lightweight deployment
+
+instead of realtime scraping.
+
+This design prioritizes usability and responsiveness.
+
+---
+
+# Supported Data Source
+
+Currently optimized for:
+
+- Greenhouse job boards
+
+Example:
+
+```text
+https://job-boards.greenhouse.io/paypay
+```
+
+---
+
+# Local Setup
+
+## Clone Repository
+
+```bash
+git clone https://github.com/kentyon67/job_scraper.git
+cd job_scraper
+```
+
+## Install Dependencies
+
+```bash
 pip install -r requirements.txt
-5. Set OpenAI API key
-Windows PowerShell
-$env:OPENAI_API_KEY="your_api_key"
-macOS / Linux
-export OPENAI_API_KEY="your_api_key"
-How to Run
-Run data pipeline
-python -m src.cli pipeline --mode full --max-jobs 5
-Run Streamlit app
-streamlit run src/app.py
-Deployment
+```
 
-This app can be deployed on Streamlit Community Cloud.
+## Set OpenAI API Key
 
-For public demo deployment, the recommended approach is:
+```bash
+OPENAI_API_KEY=your_api_key
+```
 
-Generate CSV files locally in advance
-Push the generated data/output/*.csv
-Deploy only the Streamlit UI for viewing
+## Run Pipeline
 
-This avoids exposing API-based analysis in the public app runtime.
+```bash
+python -m src.cli pipeline --mode full
+```
 
-Notes
-OPENAI_API_KEY is required only for AI enrichment steps
-Public UI deployment can work without API calls if output CSV files are already prepared
-This project is currently designed around Greenhouse-style job pages and is planned to expand to multi-company / multi-source search in future versions
-Future Improvements
-Search-based UI
-Multi-company support
-Multi-language job support
-Database integration
-API backend
-Scheduled updates
-Author
+## Run App
 
-Built as a portfolio project for internship-ready Python engineering work.
+```bash
+streamlit run streamlit_app.py
+```
 
-Tech Stack
-Python
-Streamlit
-pandas
-requests
-BeautifulSoup
-lxml
-OpenAI API
-Setup
-1. Clone repository
-git clone <your-repo-url>
-cd <your-repo-name>
-2. Create virtual environment
-python -m venv .venv
-3. Activate virtual environment
-Windows PowerShell
-.venv\Scripts\Activate.ps1
-macOS / Linux
-source .venv/bin/activate
-4. Install dependencies
-pip install -r requirements.txt
-5. Set OpenAI API key
-Windows PowerShell
-$env:OPENAI_API_KEY="your_api_key"
-macOS / Linux
-export OPENAI_API_KEY="your_api_key"
-How to Run
-Run data pipeline
-python -m src.cli pipeline --mode full --max-jobs 5
-Run Streamlit app
-streamlit run src/app.py
-Deployment
+---
 
-This app can be deployed on Streamlit Community Cloud.
+# Future Improvements (Mode B)
 
-For public demo deployment, the recommended approach is:
+Planned extensions:
 
-Generate CSV files locally in advance
-Push the generated data/output/*.csv
-Deploy only the Streamlit UI for viewing
+- FastAPI backend
+- Database integration
+- Realtime job search
+- Automatic scheduled updates
+- Multi-source job board support
+- API-based search architecture
 
-This avoids exposing API-based analysis in the public app runtime.
+---
 
-Notes
-OPENAI_API_KEY is required only for AI enrichment steps
-Public UI deployment can work without API calls if output CSV files are already prepared
-This project is currently designed around Greenhouse-style job pages and is planned to expand to multi-company / multi-source search in future versions
-Future Improvements
-Search-based UI
-Multi-company support
-Multi-language job support
-Database integration
-API backend
-Scheduled updates
-Author
+# Author
 
-Built as a portfolio project for internship-ready Python engineering work.
+Kensei Ogura
+
+GitHub:
+https://github.com/kentyon67
