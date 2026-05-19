@@ -70,7 +70,7 @@ def fetch_html(url: str, session : requests.Session) -> str:
             return html
 
         except requests.RequestException as  e:
-            status = getattr((e, "status", None),"status_code", None)
+            status = getattr(getattr(e, "response", None), "status_code", None)
             is_last_attempt = attempt == LIST_MAX_ATTEMPTS
             should_retry = should_retry_request(status)
 
