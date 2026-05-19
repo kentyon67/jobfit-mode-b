@@ -1,18 +1,18 @@
-# Virtual environment
-.venv/
-venv/
-
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Build / packaging
-build/
-dist/
-*.egg-info/
+# Virtual environment
+.venv/
+venv/
+env/
 
-# IDE / editor
+# Environment variables
+.env
+.env.*
+
+# IDE / Editor
 .idea/
 .vscode/
 
@@ -20,16 +20,22 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Test / lint cache
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# Logs
+*.log
+failures.csv
+retry_failures.csv
+data/raw/
+data/failures.csv
+data/retry_failures.csv
 
-# Environment / secrets
-.env
-.env.*
-.streamlit/secrets.toml
+# Intermediate output files
+data/output/jobs.csv
+data/output/jobs_enriched.csv
+data/output/jobs_translated.csv
+data/output/translated.csv
+data/output/jobs_scored.csv
+data/output/jobs_compared.csv
+data/output/jobs_detail_view.csv
 
-
-# Optional: if you do NOT want generated outputs in repo
-# data/output/*.csv
+# Keep final Mode A dataset
+!data/output/jobs_classified.csv
