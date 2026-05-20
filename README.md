@@ -8,9 +8,7 @@ AI-powered job analysis web application built with Python and Streamlit.
 
 # Live Demo
 
-https://YOUR-STREAMLIT-URL.streamlit.app
-
-https://jobscraper-n3etsba4vo9mw8nxplxbmd.streamlit.app/
+https://jobfit-n3etsba4vo9mw8nxplxbmd.streamlit.app/
 
 ---
 
@@ -193,7 +191,7 @@ https://job-boards.greenhouse.io/paypay
 ## Clone Repository
 
 ```bash
-git clone https://github.com/kentyon67/job_scraper.git
+git clone https://github.com/kentyon67/jobfit.git
 cd job_scraper
 ```
 
