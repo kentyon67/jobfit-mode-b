@@ -1,10 +1,8 @@
-# JobFit Mode A
+# JobFit
 
-AIを活用して求人情報を分析・可視化する、求人分析Webアプリです。
-モードAでは
-JobFitは、求人ページをスクレイピングし、
-AIによる要約・翻訳・分類・スコアリングを行い、
-ユーザーのプロフィールに応じて求人とのマッチ度を可視化します。
+AI-powered job analysis web application built with Python and Streamlit.
+
+求人情報をAIで分析・可視化するWebアプリです。
 
 ---
 
@@ -12,15 +10,15 @@ AIによる要約・翻訳・分類・スコアリングを行い、
 
 https://YOUR-STREAMLIT-URL.streamlit.app
 
+https://jobscraper-n3etsba4vo9mw8nxplxbmd.streamlit.app/
+
 ---
 
 # Screenshots
 
-## Home
-
-![img_2.png](images/img_2.png)
-
 ## Job List
+
+![img_1.png](images/img_1.png)
 
 ![img_3.png](images/img_3.png)
 
@@ -36,16 +34,18 @@ https://YOUR-STREAMLIT-URL.streamlit.app
 
 # Features
 
-- 求人情報スクレイピング
-- AI要約
-- AI翻訳
-- 技術タグ抽出
-- 求人カテゴリ分類
-- 求人価値スコアリング
-- プロフィールベースのマッチ度計算
-- キーワード検索
-- 職種・勤務形態・雇用形態フィルタ
-- StreamlitでのWeb UI
+- Job scraping
+- AI summarization
+- AI translation
+- Job classification
+- Technology tag extraction
+- Profile-based rescoring
+- Keyword search
+- Job filtering
+- Streamlit web UI
+
+求人情報を収集し、
+AIによる分析・分類・スコアリングを行います。
 
 ---
 
@@ -54,7 +54,7 @@ https://YOUR-STREAMLIT-URL.streamlit.app
 ## Frontend
 
 - Streamlit
-- css
+- HTML/CSS
 
 ## Backend / Data Processing
 
@@ -93,6 +93,9 @@ score
 Streamlit UI
 ```
 
+スクレイピングからAI分析、
+UI表示までをパイプライン化しています。
+
 ---
 
 # Project Structure
@@ -116,9 +119,9 @@ job_scraper/
 │   └── pipeline/
 │
 ├── data/
-│   ├── raw/
 │   └── output/
 │
+├── images/
 └── README.md
 ```
 
@@ -136,16 +139,22 @@ Each processing stage is separated into independent modules:
 - scoring
 - UI
 
-This structure makes the pipeline easier to extend and maintain.
+This structure improves maintainability and extensibility.
+
+責務分離を意識して設計しています。
 
 ---
 
 ## 2. Dynamic Profile-Based Rescoring
 
-JobFit recalculates fit scores dynamically
-based on user profile settings without rebuilding datasets.
+JobFit dynamically recalculates fit scores
+based on user profile settings.
 
-This enables fast UI-side personalization.
+This enables lightweight personalization
+without rebuilding datasets.
+
+プロフィール変更時に、
+UI側で再スコアリングを行います。
 
 ---
 
@@ -153,13 +162,15 @@ This enables fast UI-side personalization.
 
 Mode A focuses on:
 
-- preprocessing large job datasets
-- fast UI filtering
+- preprocessed datasets
+- fast filtering
 - lightweight deployment
+- responsive UI
 
 instead of realtime scraping.
 
-This design prioritizes usability and responsiveness.
+事前生成済みデータを利用することで、
+高速な検索体験を実現しています。
 
 ---
 
@@ -222,6 +233,9 @@ Planned extensions:
 - Automatic scheduled updates
 - Multi-source job board support
 - API-based search architecture
+
+将来的には、
+リアルタイム検索型アプリへの拡張を予定しています。
 
 ---
 
