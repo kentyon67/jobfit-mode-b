@@ -39,3 +39,6 @@ data/output/jobs_detail_view.csv
 
 # Keep final Mode A dataset
 !data/output/jobs_classified.csv
+
+# SQLite database file
+jobfit.db

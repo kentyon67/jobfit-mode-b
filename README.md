@@ -237,6 +237,91 @@ Planned extensions:
 
 ---
 
+---
+
+# Mode B — FastAPI Backend
+
+JobFit Mode B is a backend-focused rebuild using FastAPI and SQLite.
+
+This version is designed as a portfolio project demonstrating production-style backend engineering.
+
+## Tech Stack
+
+- FastAPI
+- SQLAlchemy
+- SQLite（→ PostgreSQL予定）
+- Pydantic v2
+- uvicorn
+
+## Setup
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/kentyon67/jobfit-Mode-B.git
+cd jobfit-Mode-B
+pip install -r requirements.txt
+```
+
+### 2. Seed Database
+
+CSVデータをSQLiteにインポートします。
+
+```bash
+python scripts/seed_db.py
+```
+
+### 3. Start API Server
+
+```bash
+uvicorn backend.app.main:app --reload
+```
+
+API docs: http://localhost:8000/docs
+
+## Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/` | ヘルスチェック（メッセージ） |
+| GET | `/health` | ヘルスチェック（status: ok） |
+| GET | `/jobs/` | 求人一覧（ページネーション・フィルタ対応） |
+| GET | `/jobs/{job_id}` | 求人詳細 |
+
+### Query Parameters（`GET /jobs/`）
+
+| Parameter | Type | Description |
+|---|---|---|
+| `limit` | int | 取得件数（デフォルト: 20） |
+| `offset` | int | 取得開始位置（デフォルト: 0） |
+| `category` | str | カテゴリでフィルタ（例: `AI/ML`） |
+| `work_style` | str | 勤務スタイルでフィルタ（例: `Remote`） |
+
+## Project Structure
+
+```text
+jobfit-Mode-B/
+├── backend/
+│   └── app/
+│       ├── main.py        # FastAPIアプリ本体
+│       ├── database.py    # DBエンジン・セッション
+│       ├── models.py      # SQLAlchemy モデル
+│       ├── schemas.py     # Pydantic スキーマ
+│       ├── crud/
+│       │   └── jobs.py    # DB検索ロジック
+│       └── routers/
+│           └── jobs.py    # APIルーター
+├── scripts/
+│   └── seed_db.py         # CSVデータ投入スクリプト
+├── data/
+│   └── output/
+│       └── jobs_classified.csv
+├── requirements.txt       # ModeB依存関係
+└── requirements_modea.txt # ModeA依存関係（参照用）
+```
+
+---
+
 # Author
 
 Kensei Ogura

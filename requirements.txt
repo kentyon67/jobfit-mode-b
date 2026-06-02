@@ -1,6 +1,4 @@
-streamlit
+fastapi
+uvicorn
+sqlalchemy
 pandas
-requests
-beautifulsoup4
-lxml
-openai
