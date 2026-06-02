@@ -1,15 +1,7 @@
-import pandas as pd
 import streamlit as st
 
 from src.analysis.ai.score import score_row
-
-
-
-CLASSIFIED_PATH = "data/output/jobs_classified.csv"
-
-
-def load_classified_data() -> pd.DataFrame:
-    return pd.read_csv(CLASSIFIED_PATH).fillna("")
+from src.api_client import fetch_job
 
 
 def build_user_profile_from_session_state() -> dict | None:
@@ -125,36 +117,25 @@ def main() -> None:
     if st.button("← 一覧に戻る"):
         st.switch_page("streamlit_app.py")
 
-    selected_job_key = st.session_state.get("selected_job_key", "")
-    selected_url = st.session_state.get("selected_url", "")
+    selected_job_id = st.session_state.get("selected_job_id", None)
 
-
-    if not selected_job_key and not selected_url:
+    if not selected_job_id:
         st.warning("詳細表示する求人が選ばれていません。一覧ページから選んでください。")
         return
 
     try:
-        df = load_classified_data()
-    except FileNotFoundError:
-        st.error("jobs_classified.csv が見つかりません。pipeline を実行してください。")
+        base_row = fetch_job(selected_job_id)
+    except ConnectionError as e:
+        st.error(f"🔌 APIサーバーに接続できません\n\n{e}")
+        st.code("uvicorn backend.app.main:app --reload", language="bash")
+        return
+    except ValueError as e:
+        st.error(str(e))
         return
     except Exception as e:
-        st.error(f"詳細データの読み込みに失敗しました: {e}")
+        st.error(f"求人詳細の取得に失敗しました: {e}")
         return
 
-    matched = pd.DataFrame()
-
-    if selected_job_key and "job_key" in df.columns:
-        matched = df[df["job_key"].astype(str) == str(selected_job_key)]
-
-    if matched.empty and selected_url:
-        matched = df[df["url"].astype(str) == str(selected_url)]
-
-    if matched.empty:
-        st.error("選択した求人の詳細データが見つかりませんでした。")
-        return
-
-    base_row = matched.iloc[0].to_dict()
     profile = build_user_profile_from_session_state()
     row = score_row(base_row, user_profile=profile)
 

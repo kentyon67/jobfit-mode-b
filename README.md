@@ -265,19 +265,29 @@ pip install -r requirements.txt
 
 ### 2. Seed Database
 
-CSVデータをSQLiteにインポートします。
+CSVデータをSQLiteにインポートします。初回のみ実行します。
 
 ```bash
 python scripts/seed_db.py
 ```
 
-### 3. Start API Server
+### 3. Start API Server（ターミナル1）
 
 ```bash
 uvicorn backend.app.main:app --reload
 ```
 
 API docs: http://localhost:8000/docs
+
+### 4. Start Streamlit（ターミナル2）
+
+```bash
+streamlit run streamlit_app.py
+```
+
+App: http://localhost:8501
+
+> FastAPI が起動していない状態で Streamlit を開くと、接続エラーとコマンド案内が表示されます。
 
 ## Endpoints
 

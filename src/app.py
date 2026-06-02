@@ -2,13 +2,12 @@ import pandas as pd
 import streamlit as st
 
 from src.analysis.ai.score import score_rows
+from src.api_client import fetch_jobs
 
 
-CLASSIFIED_PATH = "data/output/jobs_classified.csv"
-
-
-def load_classified_data() -> pd.DataFrame:
-    return pd.read_csv(CLASSIFIED_PATH).fillna("")
+def load_jobs_from_api() -> pd.DataFrame:
+    items = fetch_jobs()
+    return pd.DataFrame(items).fillna("")
 
 
 def inject_css() -> None:
@@ -239,6 +238,11 @@ def build_user_profile_from_session_state() -> dict | None:
 
 def rescore_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     profile = build_user_profile_from_session_state()
+
+    # 一覧APIは description 等を含まないため score_row() の job_score 再計算値がずれる。
+    # DBの値を先に保存し、fit_score 計算後に復元する。
+    db_job_scores = pd.to_numeric(df["job_score"], errors="coerce").fillna(0).reset_index(drop=True)
+
     rows = df.to_dict(orient="records")
     scored_rows = score_rows(rows, user_profile=profile)
 
@@ -246,6 +250,9 @@ def rescore_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     for col in ["job_score", "fit_score", "total_score"]:
         scored_df[col] = pd.to_numeric(scored_df[col], errors="coerce").fillna(0)
+
+    scored_df["job_score"] = db_job_scores
+    scored_df["total_score"] = scored_df["job_score"] + scored_df["fit_score"]
 
     scored_df = scored_df.sort_values(
         by=["total_score", "fit_score", "job_score"],
@@ -384,7 +391,8 @@ def render_filters(df: pd.DataFrame) -> pd.DataFrame:
             )
 
         with col5:
-            min_score = st.slider("最低総合スコア", 0, 200, 0, 10)
+            score_max = max(int(pd.to_numeric(df["total_score"], errors="coerce").max()), 10)
+            min_score = st.slider("最低総合スコア", 0, score_max, 0, 10)
 
     if selected_category != "すべて":
         filtered = filtered[filtered["job_category"].astype(str) == selected_category]
@@ -489,11 +497,10 @@ def render_job_card(row: pd.Series) -> None:
         with btn_center:
             if st.button(
                 "詳細を見る",
-                key=f"detail_{row.get('job_key', rank)}",
+                key=f"detail_{row.get('id', rank)}",
                 use_container_width=True,
             ):
-                st.session_state.selected_job_key = row.get("job_key", "")
-                st.session_state.selected_url = row.get("url", "")
+                st.session_state.selected_job_id = int(row.get("id", 0))
                 st.switch_page("pages/job_detail.py")
 
 
@@ -508,12 +515,13 @@ def main() -> None:
     init_profile_state()
 
     try:
-        df_classified = load_classified_data()
-    except FileNotFoundError:
-        st.error("分類済みデータが見つかりません。pipeline を実行して jobs_classified.csv を作成してください。")
+        df_classified = load_jobs_from_api()
+    except ConnectionError as e:
+        st.error(f"🔌 APIサーバーに接続できません\n\n{e}")
+        st.code("uvicorn backend.app.main:app --reload", language="bash")
         return
     except Exception as e:
-        st.error(f"分類済みデータの読み込みに失敗しました: {e}")
+        st.error(f"求人データの取得に失敗しました: {e}")
         return
 
     if df_classified.empty:
